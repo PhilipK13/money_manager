@@ -7,7 +7,7 @@ function Home() {
       <h1>Money Manager</h1>
       <div className='button_ghost'>
         <Link href="/Authentication/Auth">
-          <a>Login</a>
+          <a>Login ass</a>
         </Link>
       </div>
     </div>

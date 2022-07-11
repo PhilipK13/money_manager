@@ -11,7 +11,7 @@ export const handler = async (
   callback: Callback
 ): Promise<void> => {
   const { userPoolId, userName } = event;
-
+ 
   try {
     const params = {
       GroupName: "user",
