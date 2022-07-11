@@ -1,5 +1,7 @@
 import { Callback, Context, PostConfirmationTriggerEvent } from "aws-lambda";
 import { CognitoIdentityProvider } from "@aws-sdk/client-cognito-identity-provider";
+import { SecretsManagerClient, CancelRotateSecretCommand } from "@aws-sdk/client-secrets-manager";
+import Client from "pg";
 
 /**
  * @method POST
@@ -11,17 +13,16 @@ export const handler = async (
   callback: Callback
 ): Promise<void> => {
   const { userPoolId, userName } = event;
- 
+  
+  console.log(`User ${userName} confirmed`);
+  console.log(event.request.userAttributes);
+
   try {
     const params = {
       GroupName: "user",
       UserPoolId: userPoolId,
       Username: userName,
     };
-
-    const cognito = new CognitoIdentityProvider({ region: "us-east-1" });
-
-    await cognito.adminAddUserToGroup(params);
 
     return callback(null, event);
   } catch (error) {
