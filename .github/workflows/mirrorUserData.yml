@@ -5,13 +5,13 @@ on:
     branches:
       - dev
     paths:
-      - "api/addUserData/**"
-      - ".github/workflows/addUserData.yml"
+      - "api/mirrorUserData/**"
+      - ".github/workflows/mirrorUserData.yml"
 
 env:
   AWS_REGION: ${{ secrets.AWS_REGION }}
   ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
-  FUNCTION_NAME: addUserData
+  FUNCTION_NAME: mirrorUserData
 
 jobs:
   deploy:
