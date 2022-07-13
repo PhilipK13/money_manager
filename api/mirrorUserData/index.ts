@@ -1,7 +1,7 @@
 import { Callback, Context, PostConfirmationTriggerEvent } from "aws-lambda";
 import { CognitoIdentityProvider } from "@aws-sdk/client-cognito-identity-provider";
-import { SecretsManagerClient, CancelRotateSecretCommand } from "@aws-sdk/client-secrets-manager";
-import Client from "pg";
+import { SecretsManager } from "@aws-sdk/client-secrets-manager";
+import {Client} from "pg";
 
 /**
  * @method POST
@@ -12,21 +12,44 @@ export const handler = async (
   _context: Context,
   callback: Callback
 ): Promise<void> => {
-  const { userPoolId, userName } = event;
+
+  const secrets = new SecretsManager({});
+
+  const { SecretString: pgCredentials } = await secrets.getSecretValue({
+    SecretId: "MoneyManager/Postgres",
+  });
+  const { host, password, port, username, dbInstanceIdentifier } = JSON.parse(
+    pgCredentials ?? "{}"
+  );
+
+  const client = new Client({
+    host,
+    password,
+    port,
+    user: username,
+    database: dbInstanceIdentifier,
+  });
+
+  const { userName } = event;
+  const { email, picture, name } = event.request.userAttributes;
   
-  console.log(`User ${userName} confirmed`);
-  console.log(event.request.userAttributes);
+  console.log(`User ${userName} confirmed\nEmail: ${email}\nName: ${name}\nPicture: ${picture}`);
 
   try {
-    const params = {
-      GroupName: "user",
-      UserPoolId: userPoolId,
-      Username: userName,
-    };
+    await client.connect();
 
-    return callback(null, event);
+    // Add user to group
+    await client.query(
+      `
+      INSERT INTO users (id, email, name, picture) VALUES ($1, $2, $3, $4);
+    `,
+      [userName, email, name, picture]
+    );
+
   } catch (error) {
     console.error(error);
-    return callback(error as Error, event);
+    throw error;
+  } finally {
+    await client.end();
   }
 };
