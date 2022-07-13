@@ -11,7 +11,7 @@ export const handler = async (
   event: PostConfirmationTriggerEvent,
   _context: Context,
   callback: Callback
-): Promise<void> => {
+): Promise<PostConfirmationTriggerEvent> => {
 
   const secrets = new SecretsManager({});
 
@@ -45,8 +45,8 @@ export const handler = async (
     `,
       [userName, email, name, picture]
     );
-    
-    return callback(null, { statusCode: 200 });
+
+    return event
   } catch (error) {
     console.error(error);
     throw error;
