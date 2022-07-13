@@ -32,25 +32,24 @@ export const handler = async (
 
   const { userName } = event;
   const { email, picture, name } = event.request.userAttributes;
-  
   console.log(client);
   console.log(`User ${userName} confirmed\nEmail: ${email}\nName: ${name}\nPicture: ${picture}`);
 
-  // try {
-  //   await client.connect();
+  try {
+    await client.connect();
 
-  //   // Add user to group
-  //   await client.query(
-  //     `
-  //     INSERT INTO users (id, email, name, picture) VALUES ($1, $2, $3, $4);
-  //   `,
-  //     [userName, email, name, picture]
-  //   );
+    // Add user to group
+    await client.query(
+      `
+      INSERT INTO users (id, email, name, picture) VALUES ($1, $2, $3, $4);
+    `,
+      [userName, email, name, picture]
+    );
 
-  // } catch (error) {
-  //   console.error(error);
-  //   throw error;
-  // } finally {
-  //   await client.end();
-  // }
+  } catch (error) {
+    console.error(error);
+    throw error;
+  } finally {
+    await client.end();
+  }
 };
