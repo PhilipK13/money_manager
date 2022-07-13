@@ -15,7 +15,7 @@ function Home() {
         loadingText="Loading..."
         onClick={(e) => {
           e.preventDefault();
-          router.push("/Authentication/Auth")
+          router.push("https://moneymanager.auth.us-east-1.amazoncognito.com/login?response_type=token&client_id=8rhrojpcl1rsq9ekmh34oqhcu&redirect_uri=http://localhost:3000")
         }}
       >
         Login
