@@ -1,19 +1,17 @@
 import styles from '../../styles/Home.module.css'
+import { useState, ChangeEvent } from 'react';
+import { useRouter } from 'next/router'
+import { Button } from '@aws-amplify/ui-react';
+import '@aws-amplify/ui-react/styles.css';
+import { cursorTo } from 'readline';
 
 export default function Auth() {
-  return (
-    <div className={styles.container}>
-      <main className={styles.main}>
-        <h1 className="text-3xl font-bold underline">
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
 
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
-        
-      </main>
+  const [email, setEmail] = useState('');
+
+  return (
+    <div className="flex flex-col space-y-4">
+      
     </div>
   )
 }

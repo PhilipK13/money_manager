@@ -1,10 +1,11 @@
 import Head from 'next/head'
 import '../styles/globals.css'
 import { AppProps } from 'next/app'
+import React from 'react'
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <>
+    <React.Fragment>
       <Head>
         <meta charSet="utf-8" />
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
@@ -24,6 +25,14 @@ export default function MyApp({ Component, pageProps }: AppProps) {
           sizes="16x16"
         />
         <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+        />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/icon?family=Material+Icons"
+        />
+        <link
           href="/icons/favicon-32x32.png"
           rel="icon"
           type="image/png"
@@ -32,7 +41,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
         <link rel="apple-touch-icon" href="/apple-icon.png"></link>
         <meta name="theme-color" content="#317EFB" />
       </Head>
-      <Component {...pageProps} />
-    </>
+      <Component {...pageProps } />
+    </React.Fragment>
   )
 }
