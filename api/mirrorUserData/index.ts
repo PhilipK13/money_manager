@@ -45,7 +45,8 @@ export const handler = async (
     `,
       [userName, email, name, picture]
     );
-
+    
+    return callback(null, { statusCode: 200 });
   } catch (error) {
     console.error(error);
     throw error;
