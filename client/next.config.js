@@ -12,6 +12,12 @@ const nextConfig = withPWA({
     dest: "public",
     runtimeCaching,
   },
+  rewrites: async () => [
+    {
+      source: "/api/:path*",
+      destination: `https://ftlupfowk7.execute-api.us-east-1.amazonaws.com/${prod ? "prod" : "dev"}/:path*`,
+    },
+  ],
 });
 
 module.exports = nextConfig;

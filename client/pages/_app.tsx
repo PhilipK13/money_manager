@@ -2,10 +2,17 @@ import Head from 'next/head'
 import '../styles/globals.css'
 import { AppProps } from 'next/app'
 import React from 'react'
+import { Authenticator } from '@aws-amplify/ui-react';
+import '@aws-amplify/ui-react/styles.css';
+import { Amplify } from 'aws-amplify';
+
+import config from '../config';
+Amplify.configure(config);
+
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <>
+    <Authenticator.Provider>
       <Head>
         <meta charSet="utf-8" />
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
@@ -42,6 +49,6 @@ export default function MyApp({ Component, pageProps }: AppProps) {
         <meta name="theme-color" content="#317EFB" />
       </Head>
       <Component {...pageProps } />
-    </>
+    </Authenticator.Provider>
   )
 }
