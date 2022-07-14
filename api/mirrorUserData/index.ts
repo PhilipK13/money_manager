@@ -30,10 +30,8 @@ export const handler = async (
     database: dbInstanceIdentifier,
   });
 
-  const { userName } = event;
-  const { email, picture, name } = event.request.userAttributes;
-  console.log(JSON.stringify(event));
-  console.log(`User ${userName} confirmed\nEmail: ${email}\nName: ${name}\nPicture: ${picture}`);
+  
+  const { email, picture, name, sub } = event.request.userAttributes;
 
   try {
     await client.connect();
@@ -43,7 +41,7 @@ export const handler = async (
       `
       INSERT INTO users (id, email, name, picture) VALUES ($1, $2, $3, $4);
     `,
-      [userName, email, name, picture]
+      [sub, email, name, picture]
     );
 
     return event
