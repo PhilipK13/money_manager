@@ -46,6 +46,8 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<any[]> => {
       [userId]
     );
 
+    console.log("Normal" + rows);
+    console.log("STRINGIFY" + JSON.stringify(rows));
     const groups = rows
 
     return groups;
