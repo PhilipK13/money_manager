@@ -5,7 +5,7 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 
 /**
  * @method GET
- * @description Get the group id's that a user is a member of
+ * @description Returns a list of groups that the user is a member of
  */
 export const handler = async (event: APIGatewayProxyEvent): Promise<any[]> => {
   const secrets = new SecretsManager({});
