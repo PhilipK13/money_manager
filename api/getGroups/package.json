@@ -1,5 +1,5 @@
 {
-  "name": "create-group",
+  "name": "get-groups",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
