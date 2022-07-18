@@ -6,7 +6,7 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 interface Transaction {
   group_id: number;
   cost: number;
-  description: number;
+  description: string;
   splits: TransactionSplit[];
 }
 
@@ -57,7 +57,7 @@ export const handler = async (
         rows: [newTransaction],
       } = await client.query<Omit<Transaction, "splits"> & { id: number }>(
         `
-          INSERT INTO transactions (user_id, group_id, cost, description) VALUES (%L) RETURNING *;
+          INSERT INTO transactions (user_id, group_id, cost, description) VALUES ($1, $2, $3, $4) RETURNING *;
         `,
         [user_id, group_id, cost, description]
       );
