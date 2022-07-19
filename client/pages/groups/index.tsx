@@ -38,7 +38,7 @@ export default function groups() {
   const getUsersGroups = async () => {
     try {
       const resp = await axios.get(
-        `/api/groups/getGroups`,
+        `/api/groups/retrieve`,
         { headers: { Authorization: `Bearer ${getToken(user)}` } }
       );
       setUsersCurrentGroups(resp.data);
