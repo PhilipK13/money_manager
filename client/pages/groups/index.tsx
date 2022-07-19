@@ -42,6 +42,7 @@ export default function groups() {
         { headers: { Authorization: `Bearer ${getToken(user)}` } }
       );
       setUsersCurrentGroups(resp.data);
+      console.log(resp.data);
     } catch (err) {
       console.log(err);
     }

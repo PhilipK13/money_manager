@@ -5,14 +5,13 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 
 /**
  * @method POST
- * @description Returns a list of transactions that belong to a given group
+ * @description Returs a list of users from a group
  */
 export const handler = async (event: APIGatewayProxyEvent): Promise<any[]> => {
   const secrets = new SecretsManager({});
 
   const { group_id } = JSON.parse(event.body ?? "{}")
   const { authorization } = event.headers;
-  
 
   const { SecretString: pgCredentials } = await secrets.getSecretValue({
     SecretId: "MoneyManager/Postgres",
@@ -37,19 +36,18 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<any[]> => {
   try {
     await client.connect();
 
-    // Query the transaction table for all transactions that belong to the group
-    const { rows: transactions } = await client.query(
-    `
-      SELECT * FROM transactions WHERE group_id = $1;
+    // Query the user_groups table for all users that belong to the group
+    const { rows } = await client.query(
+      `
+      SELECT users.id, users.email, users.name, users.picture
+      FROM users
+      JOIN user_groups ON user_groups.user_id = users.id
+      WHERE user_groups.group_id = $1;
     `,
       [group_id]
     );
-    
 
-    console.log("Normal" + transactions);
-    console.log("STRINGIFY" + JSON.stringify(transactions));
-
-    return transactions;
+    return rows;
   } catch (error) {
     console.error(error);
     throw error;
