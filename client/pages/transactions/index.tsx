@@ -10,20 +10,35 @@ import getToken from '../../utils/getToken';
 import getUserAttributes from '../../utils/getUserAttributes';
 
 
-export default function transactions() {
+type Transaction = {
+  id: number;
+  group_id: number;
+  description: string;
+  cost: number;
+  splits: TransactionSplit[];
+}
 
-  const {user} = useAuthenticator();
+type TransactionSplit = {
+  user_id: string;
+  share: number;
+}
+
+
+
+export default function transactions() {
 
   const router = useRouter();
 
-  const groupId = Number(router.query.groupid);
 
+  const {user} = useAuthenticator();
+  const groupId = Number(router.query.groupid);
+  
   interface TransactionSplit{
     user_id: string;
     share: number;
   }
 
-  const [transactions, setTransactions] = useState([]);
+  const [transactionsRetrieved, setTransactionsRetrieved] = useState([]);
   const [showCreate, setShowCreate] = useState(false)
   const [description, setDescription] = useState('')
   const [cost, setCost] = useState('')
@@ -32,27 +47,26 @@ export default function transactions() {
   var lock = 0;
 
   //Runs once the user is logged in and verified, will only run once
-  // useEffect(() => {
-  //   if(user && lock == 0) {
-  //     lock = 1;
-  //     getUsersGroups();
-  //   }
-  // }, [user]);
+  useEffect(() => {
+    if(user && groupId && lock == 0) {
+      lock = 1;
+      getTransactions();
+    }
+  }, [user, groupId]);
  
   //Gets the users groups from the database
-  // const getUsersGroups = async () => {
-  //   try {
-  //     const resp = await axios.get(
-  //       `/api/groups/getGroups`,
-  //       { headers: { Authorization: `Bearer ${getToken(user)}` } }
-  //     );
-  //     setUsersCurrentGroups(resp.data);
-  //   } catch (err) {
-  //     console.log(err);
-  //   }
-  // }
-
-
+  const getTransactions = async () => {
+    try {
+      const resp = await axios.post(
+        `/api/transactions/retrieve`,
+        { group_id: groupId },
+        { headers: { Authorization: `Bearer ${getToken(user)}` } },
+      );
+      setTransactionsRetrieved(resp.data);
+    } catch (err) {
+      console.log(err);
+    }
+  }
 
   //Creates a new group associated with the user
   const createTransaction = async (e:  MouseEvent<HTMLButtonElement>) => {
@@ -75,7 +89,8 @@ export default function transactions() {
       console.log(resp);
       console.log(resp.status)
       if(resp.status === 201) {
-        console.log("success")
+        getTransactions();  
+        setShowCreate(false);
       }
     } catch (err) {
       console.log(err);
@@ -92,7 +107,15 @@ export default function transactions() {
       <h1>Current Transactions</h1>
       <div className="flex flex-col space-y-4">
         {/* Displays all the transactions that are part of this group */}
-        
+        {transactionsRetrieved.map((transaction: Transaction) => (
+          <a 
+            className="flex flex-col space-y-4 border-cyan-800 hover:cursor-pointer border" 
+            key={transaction.id}
+          >
+            <h2>{transaction.description}</h2>
+            <p>Cost: {Number(transaction.cost).toFixed(2)}</p>
+          </a>
+        ))}
       </div>
       <Button
         onClick={showTransaction}
@@ -117,7 +140,7 @@ export default function transactions() {
           <Button
             onClick={(e: MouseEvent<HTMLButtonElement>) => {createTransaction(e)}}
           >
-            Create Group
+            Create Transaction
           </Button>
         </div>
       )}
