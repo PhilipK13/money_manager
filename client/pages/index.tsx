@@ -25,7 +25,7 @@ function Home() {
       </div>
     )
   } else {
-    router.push('/Home/Home')
+    router.push('/groups/')
   }
 
   return (

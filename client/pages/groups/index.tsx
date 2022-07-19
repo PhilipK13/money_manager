@@ -7,7 +7,9 @@ import getToken from '../../utils/getToken';
 import axios from 'axios';
 
 
-export default function Home() {
+export default function groups() {
+
+  const router = useRouter();
 
   type Group = {
     id: Key;
@@ -58,7 +60,7 @@ export default function Home() {
         { headers: { Authorization: `Bearer ${getToken(user)}` } }
       );
       console.log(resp);
-      console.log(resp.status)
+      console.log(resp.status);
       if(resp.status === 200) {
         getUsersGroups();  
         setShowGroupCreate(false);
@@ -79,10 +81,20 @@ export default function Home() {
       <div className="flex flex-col space-y-4">
         {/* Displays all the groups the user is in using the name in the order of id */}
         {usersCurrentGroups.map((group: Group) => (
-          <div className="flex flex-col space-y-4" key={group.id}>
+          <a 
+            className="flex flex-col space-y-4 border-cyan-800 hover:cursor-pointer border" 
+            key={group.id}
+            onClick={() => {
+              router.push({
+                pathname: `../transactions/`,
+                query: { groupid: group.id },
+                
+              })
+            }}
+          >
             <h2>{group.name}</h2>
             <p>{group.description}</p>
-          </div>
+          </a>
         ))}
       </div>
       <Button
