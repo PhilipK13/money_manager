@@ -10,7 +10,7 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 export const handler = async (event: APIGatewayProxyEvent): Promise<any[]> => {
   const secrets = new SecretsManager({});
 
-  const transactions: any = JSON.parse(event.body ?? "{}")
+  const transactions: any = JSON.parse(event.body.transactions ?? "{}")
   const { authorization } = event.headers;
   
 
@@ -34,11 +34,13 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<any[]> => {
     authorization.replace("Bearer ", "")
   ) as JwtPayload;
 
+  console.log(transactions)
 
   try {
     await client.connect();
 
     
+
 
     // Query the transaction_splits table for all transaction splits that have a matching id for any of the numbers in the transactions array
 
