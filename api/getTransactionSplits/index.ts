@@ -34,8 +34,17 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<any[]> => {
     authorization.replace("Bearer ", "")
   ) as JwtPayload;
 
-  const { group_id } = transactions
-  console.log(group_id);
+  var as = JSON.parse(transactions);
+  console.log(as);
+
+  var result: any[] = [];
+
+  var keys = Object.keys(transactions);
+  keys.forEach(function(key){
+    result.push(transactions[key]);
+  });
+
+  console.log(result);
 
   try {
     await client.connect();
