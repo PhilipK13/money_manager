@@ -8,7 +8,7 @@ import axios from 'axios';
 
 import getToken from '../../utils/getToken';
 import getUserAttributes from '../../utils/getUserAttributes';
-import { AiOutlineLoading3Quarters as LoadingIcon } from 'react-icons/ai';
+import { Loader } from '@aws-amplify/ui-react';
 
 
 type Transaction = {
@@ -48,6 +48,7 @@ export default function transactions() {
   const [groupUsers, setGroupUsers] = useState<any>([]);
   const [groupUsersSplitting, setGroupUsersSpltting] = useState<any>([]);
   const [transactionsRetrieved, setTransactionsRetrieved] = useState([]);
+  const [transactionIds, setTransactionIds] = useState<any>([]);
 
   const [manualSplit, setManualSplit] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
@@ -81,6 +82,24 @@ export default function transactions() {
     }
   }
 
+  const getTransactionSplits = async () => {
+    try {
+      const resp = await axios.post(
+        `/api/transactions/retrieve/splits`,
+        {
+          transactions: transactionIds
+        },
+        { headers: { Authorization: `Bearer ${getToken(user)}` } }
+      );
+      
+      if(resp.status === 201) {
+        console.log("Successfully retrieved splits\n" + resp.data);
+      }
+    } catch (err) {
+      console.log(err);
+    };
+  }
+
   //Gets the transactions associtated with the group
   const getTransactions = async () => {
     try {
@@ -89,15 +108,17 @@ export default function transactions() {
         { group_id: groupId },
         { headers: { Authorization: `Bearer ${getToken(user)}` } },
       );
+
       await getUsersFromGroup();
-      await setTransactionsRetrieved(resp.data);
+      setTransactionsRetrieved(resp.data);
+      setTransactionIds(resp.data.map((transaction: { id: number; }) => transaction.id));
       setDataRecieved(true);
     } catch (err) {
       console.log(err);
     } 
   }
 
-  //Creates a new group associated with the user
+  //Creates a new transaction associated with the group
   const createTransaction = async (e:  MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     if(groupUsersSplitting.length < 2) {
@@ -141,9 +162,10 @@ export default function transactions() {
   }
     
   useEffect(() => {
-    console.log(manualSplit)
-    
-  }, [manualSplit]);
+    if(transactionIds.length > 0) {
+      getTransactionSplits()
+    }
+  }, [transactionIds]);
 
   const displayUsers = (display: any[], location: string) => {
     let image = true;
@@ -209,7 +231,7 @@ export default function transactions() {
             </a>
           ))
          ) : (
-          <LoadingIcon style = {{transform: 'rotate(90deg)' }}/>
+          <Loader />
          )}
         
         

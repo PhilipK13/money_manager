@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@aws-amplify/ui-react": "^3.0.4",
+    "@radix-ui/react-dialog": "^1.0.0",
     "aws-amplify": "^4.3.27",
     "axios": "^0.27.2",
     "next": "latest",
