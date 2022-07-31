@@ -34,10 +34,14 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<any[]> => {
     authorization.replace("Bearer ", "")
   ) as JwtPayload;
 
+  console.log(transactions)
+  const transactionIdList = transactions.join(',')
+  console.log(transactionIdList)
+
   try {
     await client.connect();
 
-    const transactionIdList = transactions.join(',')
+    
 
     // Query the transaction_splits table for all transaction splits that have a matching id for any of the numbers in the transactions array
 
