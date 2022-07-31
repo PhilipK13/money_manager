@@ -10,7 +10,7 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 export const handler = async (event: APIGatewayProxyEvent): Promise<any[]> => {
   const secrets = new SecretsManager({});
 
-  const transactions: number[] = JSON.parse(event.body ?? "{}")
+  const transactions: any[] = JSON.parse(event.body ?? "{}")
   const { authorization } = event.headers;
   
 
@@ -37,14 +37,17 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<any[]> => {
   try {
     await client.connect();
 
+    const transactionIdList = transactions.join(',')
+
     // Query the transaction_splits table for all transaction splits that have a matching id for any of the numbers in the transactions array
 
     const { rows: transactions_splits } = await client.query(
       `
       SELECT *
         FROM transaction_splits
-        WHERE transaction_id IN (${transactions.join(',')});
-      `);
+        WHERE transaction_id IN ($1);
+      `,
+      [transactionIdList]);
     
 
     console.log("Normal" + transactions_splits);
