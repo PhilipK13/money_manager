@@ -10,7 +10,7 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 export const handler = async (event: APIGatewayProxyEvent): Promise<any[]> => {
   const secrets = new SecretsManager({});
 
-  const transactions: any = JSON.parse(event.body.transactions ?? "{}")
+  const transactions: any = JSON.parse(event.body ?? "{}")
   const { authorization } = event.headers;
   
 
@@ -34,7 +34,12 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<any[]> => {
     authorization.replace("Bearer ", "")
   ) as JwtPayload;
 
-  console.log(transactions)
+  const transaction_ids = transactions.map((transaction: any) => transaction)
+  const { test } = transactions[0]
+  const { group_id } = transactions
+  console.log(transaction_ids);
+  console.log(test);
+  console.log(group_id);
 
   try {
     await client.connect();
