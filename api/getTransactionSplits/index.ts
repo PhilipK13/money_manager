@@ -3,6 +3,11 @@ import { APIGatewayProxyEvent } from "aws-lambda";
 import { Client } from "pg";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
+
+interface transactionList {
+  transaction: any[]
+}
+
 /**
  * @method POST
  * @description Returns a list transaction splits that are associated with a group
@@ -10,7 +15,7 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 export const handler = async (event: APIGatewayProxyEvent): Promise<any[]> => {
   const secrets = new SecretsManager({});
 
-  const transactions: any = JSON.parse(event.body ?? "{}")
+  const transactions: transactionList = JSON.parse(event.body ?? "{}")
   const { authorization } = event.headers;
   
 
@@ -34,29 +39,20 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<any[]> => {
     authorization.replace("Bearer ", "")
   ) as JwtPayload;
 
+  console.log(transactions)
+  console.log(transactions.transaction)
+  console.log(transactions.transaction.join(","))
+
   try {
     await client.connect();
     // Query the transaction_splits table for all transaction splits that have a matching id for any of the numbers in the JSON transactions array object
-    const { transactions_splits } = await client.query(
-      `
+  
+    const { rows } = await client.query(`
       SELECT *
-      FROM transaction_splits
-      WHERE
-        transaction_splits.transaction_id = ANY($1)
-      ;`,[transactions]);
-
-
-
-
-
-
-    // const { rows: transactions_splits } = await client.query(
-    //   `
-    //   SELECT *
-    //     FROM transaction_splits
-    //     WHERE transaction_id IN ($1);
-    //   `,
-    //   [transactions]);
+        FROM transaction_splits
+        WHERE transaction_id IN ($1);
+      `,
+      [transactions]);
     
 
     console.log("Normal" + transactions_splits);

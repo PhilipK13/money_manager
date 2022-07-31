@@ -160,11 +160,8 @@ export default function transactions() {
       console.log(err);
     };
   }
-    
+ 
   useEffect(() => {
-    const test = [] = transactionIds
-    const list = test.join(',');
-    console.log(list);
     if(transactionIds.length > 0) {
       getTransactionSplits()
     }
