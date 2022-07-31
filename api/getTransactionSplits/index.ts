@@ -34,33 +34,29 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<any[]> => {
     authorization.replace("Bearer ", "")
   ) as JwtPayload;
 
-  var as = JSON.parse(transactions);
-  console.log(as);
-
-  var result: any[] = [];
-
-  var keys = Object.keys(transactions);
-  keys.forEach(function(key){
-    result.push(transactions[key]);
-  });
-
-  console.log(result);
-
   try {
     await client.connect();
-
-    
-
-
-    // Query the transaction_splits table for all transaction splits that have a matching id for any of the numbers in the transactions array
-
-    const { rows: transactions_splits } = await client.query(
+    // Query the transaction_splits table for all transaction splits that have a matching id for any of the numbers in the JSON transactions array object
+    const { transactions_splits } = await client.query(
       `
       SELECT *
-        FROM transaction_splits
-        WHERE transaction_id IN ($1);
-      `,
-      [transactions]);
+      FROM transaction_splits
+      WHERE
+        transaction_splits.transaction_id = ANY($1)
+      ;`,[transactions]);
+
+
+
+
+
+
+    // const { rows: transactions_splits } = await client.query(
+    //   `
+    //   SELECT *
+    //     FROM transaction_splits
+    //     WHERE transaction_id IN ($1);
+    //   `,
+    //   [transactions]);
     
 
     console.log("Normal" + transactions_splits);
