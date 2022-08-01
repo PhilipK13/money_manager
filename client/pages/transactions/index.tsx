@@ -48,7 +48,6 @@ export default function transactions() {
   const [groupUsers, setGroupUsers] = useState<any>([]);
   const [groupUsersSplitting, setGroupUsersSpltting] = useState<any>([]);
   const [transactionsRetrieved, setTransactionsRetrieved] = useState([]);
-  const [transactionIds, setTransactionIds] = useState<any>([]);
 
   const [manualSplit, setManualSplit] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
@@ -64,7 +63,10 @@ export default function transactions() {
   useEffect(() => {
     if(user && groupId && lock == 0) {
       lock = 1;
+      getUsersFromGroup();
+      getTransactionSplits();
       getTransactions();
+      
     }
   }, [user, groupId]);
  
@@ -87,7 +89,7 @@ export default function transactions() {
       const resp = await axios.post(
         `/api/transactions/retrieve/splits`,
         {
-          transaction: transactionIds
+          group_id: groupId
         },
         { headers: { Authorization: `Bearer ${getToken(user)}` } }
       );
@@ -108,10 +110,8 @@ export default function transactions() {
         { group_id: groupId },
         { headers: { Authorization: `Bearer ${getToken(user)}` } },
       );
-
-      await getUsersFromGroup();
+      
       setTransactionsRetrieved(resp.data);
-      setTransactionIds(resp.data.map((transaction: { id: number; }) => transaction.id));
       setDataRecieved(true);
     } catch (err) {
       console.log(err);
@@ -160,30 +160,6 @@ export default function transactions() {
       console.log(err);
     };
   }
-    
-  interface transactionList {
-    transaction: any[]
-  }
-
-
-
-  const test: transactionList= {
-    transaction: transactionIds
-  }
-
- 
-  useEffect(() => {
-    console.log(transactionIds)
-    var test1: transactionList = test;
-    console.log(test1.transaction);
-    for (let t in test1.transaction) {
-      console.log(test1.transaction[t] + ",")
-    }
-    console.log(typeof( test1.transaction[0]));
-    if(transactionIds.length > 0) {
-      getTransactionSplits();
-    }
-  }, [transactionIds]);
 
   const displayUsers = (display: any[], location: string) => {
     let image = true;
