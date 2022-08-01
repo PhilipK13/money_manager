@@ -73,6 +73,8 @@ export default function transactions() {
 
   const [description, setDescription] = useState('');
   const [cost, setCost] = useState('');
+  const [subTotal, setSubTotal] = useState('');
+  const [total, setTotal] = useState('');
 
   var lock = 0;
 
@@ -174,7 +176,7 @@ export default function transactions() {
         `/api/transactions/create`,
         {
           description: description,
-          cost: Number(cost),
+          cost: Number(total),
           group_id: groupId,
           splits: splits,
         },
@@ -305,13 +307,24 @@ export default function transactions() {
             onChange={(e: ChangeEvent<HTMLInputElement>) => setDescription(e.target.value)}
           />
           <TextField 
-            label="Cost"
-            placeholder="Cost"
+            label="Total"
+            placeholder="Total"
             type="number"
             inputMode="numeric"
             //set an on change to get the current value rounded to 2 decimal places
-            onChange={(e: ChangeEvent<HTMLInputElement>) => setCost(e.target.value)}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => setTotal(e.target.value)}
           />
+          {manualSplit && (
+            <TextField 
+              label="Sub-Total"
+              placeholder="Sub-Total"
+              type="number"
+              inputMode="numeric"
+              //set an on change to get the current value rounded to 2 decimal places
+              onChange={(e: ChangeEvent<HTMLInputElement>) => setSubTotal(e.target.value)}
+            />
+          )}
+          
           <SwitchField 
             label="Split Manually" 
             isChecked={manualSplit}
