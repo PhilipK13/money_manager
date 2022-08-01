@@ -175,9 +175,10 @@ export default function transactions() {
   useEffect(() => {
     console.log(transactionIds)
     var test1: transactionList = test;
-    console.log(test1.transaction.join(','));
+    console.log(test1.transaction);
+    console.log(typeof( test1.transaction[0]));
     if(transactionIds.length > 0) {
-      getTransactionSplits()
+     
     }
   }, [transactionIds]);
 

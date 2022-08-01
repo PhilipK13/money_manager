@@ -39,7 +39,10 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<any[]> => {
     authorization.replace("Bearer ", "")
   ) as JwtPayload;
 
+  console.log(typeof(transactions.transaction[0]))
+
   const transactionList = transactions.transaction.join(",");
+
 
   try {
     await client.connect();
