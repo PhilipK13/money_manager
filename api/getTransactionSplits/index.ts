@@ -41,7 +41,7 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<any[]> => {
 
   console.log(typeof(transactions.transaction[0]))
 
-  const transactionList = transactions.transaction.join(",");
+  const transactionList = transactions.transaction
 
 
   try {
@@ -51,9 +51,8 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<any[]> => {
     const { rows } = await client.query(`
       SELECT *
         FROM transaction_splits
-        WHERE transaction_id IN ($1);
-      `,
-      [transactionList.replace('"', '')]);
+        WHERE transaction_id = ANY(${transactionList});
+    `);
     
 
     console.log("Normal" + rows);

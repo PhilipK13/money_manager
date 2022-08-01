@@ -176,9 +176,12 @@ export default function transactions() {
     console.log(transactionIds)
     var test1: transactionList = test;
     console.log(test1.transaction);
+    for (let t in test1.transaction) {
+      console.log(test1.transaction[t] + ",")
+    }
     console.log(typeof( test1.transaction[0]));
     if(transactionIds.length > 0) {
-     
+      getTransactionSplits();
     }
   }, [transactionIds]);
 
