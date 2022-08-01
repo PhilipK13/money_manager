@@ -39,9 +39,7 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<any[]> => {
     authorization.replace("Bearer ", "")
   ) as JwtPayload;
 
-  console.log(transactions)
-  console.log(transactions.transaction)
-  console.log(transactions.transaction.join(","))
+  const transactionList = transactions.transaction.join(","))
 
   try {
     await client.connect();
@@ -52,7 +50,7 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<any[]> => {
         FROM transaction_splits
         WHERE transaction_id IN ($1);
       `,
-      [transactions]);
+      [transactionList]);
     
 
     console.log("Normal" + rows);

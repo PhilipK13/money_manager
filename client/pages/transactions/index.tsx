@@ -87,7 +87,7 @@ export default function transactions() {
       const resp = await axios.post(
         `/api/transactions/retrieve/splits`,
         {
-          transactions: transactionIds
+          transaction: transactionIds
         },
         { headers: { Authorization: `Bearer ${getToken(user)}` } }
       );
@@ -160,8 +160,22 @@ export default function transactions() {
       console.log(err);
     };
   }
+    
+  interface transactionList {
+    transaction: any[]
+  }
+
+
+
+  const test: transactionList= {
+    transaction: transactionIds
+  }
+
  
   useEffect(() => {
+    console.log(transactionIds)
+    var test1: transactionList = test;
+    console.log(test1.transaction.join(','));
     if(transactionIds.length > 0) {
       getTransactionSplits()
     }
