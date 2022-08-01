@@ -39,15 +39,32 @@ export default function transactions() {
   const {user} = useAuthenticator();
   const groupId = Number(router.query.groupid);
   
+  interface User {
+    id: string;
+    name: string;
+    email: string;
+    picture: string;
+  }
+
   interface TransactionSplit{
     user_id: string;
     share: number;
   }
 
+  type SplitTransaction = {
+    id: number;
+    user_id: string;
+    share: number;
+  }
   
+  const splitMap: Map<number, Array<SplitTransaction>> = new Map(); 
+  
+  const [splitMapState, setSplitMap] = useState(splitMap);
+  const [groupUsersCopy, setGroupUsersCopy] = useState<User[] | []>([]);
   const [groupUsers, setGroupUsers] = useState<any>([]);
   const [groupUsersSplitting, setGroupUsersSpltting] = useState<any>([]);
   const [transactionsRetrieved, setTransactionsRetrieved] = useState([]);
+  const [transactionSplitsRetrieved, setTransactionSplitsRetrieved] = useState<SplitTransaction[] | []>([]);
 
   const [manualSplit, setManualSplit] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
@@ -60,13 +77,11 @@ export default function transactions() {
   var lock = 0;
 
   //Runs once the user is logged in and verified, will only run once
-  useEffect(() => {
+  useEffect (() => {
     if(user && groupId && lock == 0) {
       lock = 1;
       getUsersFromGroup();
-      getTransactionSplits();
       getTransactions();
-      
     }
   }, [user, groupId]);
  
@@ -78,7 +93,9 @@ export default function transactions() {
         { group_id: groupId },
         { headers: { Authorization: `Bearer ${getToken(user)}` } }
       );
+      
       setGroupUsers(resp.data);
+      setGroupUsersCopy(resp.data);
     } catch (err) {
       console.log(err);
     }
@@ -94,23 +111,38 @@ export default function transactions() {
         { headers: { Authorization: `Bearer ${getToken(user)}` } }
       );
       
-      if(resp.status === 201) {
-        console.log("Successfully retrieved splits\n" + resp.data);
+      if(resp.status >= 200 && resp.status < 300) {
+        setTransactionSplitsRetrieved(resp.data);
       }
     } catch (err) {
       console.log(err);
     };
   }
 
+  // Once the transaction splits are retrieved, this function will create a map of the splits
+  useEffect(() => {
+    if (transactionSplitsRetrieved.length > 0) {
+      splitMapState.clear();
+      for(var t in transactionSplitsRetrieved) {
+        let temparr = splitMapState.get(transactionSplitsRetrieved[t].id);
+        temparr ? temparr.push(transactionSplitsRetrieved[t]) : undefined;
+        splitMapState.set(transactionSplitsRetrieved[t].id, temparr ? temparr : [transactionSplitsRetrieved[t]]);
+      }
+    }
+  }, [transactionSplitsRetrieved]);
+
+
   //Gets the transactions associtated with the group
   const getTransactions = async () => {
+
+    await getTransactionSplits();
+
     try {
       const resp = await axios.post(
         `/api/transactions/retrieve`,
         { group_id: groupId },
         { headers: { Authorization: `Bearer ${getToken(user)}` } },
       );
-      
       setTransactionsRetrieved(resp.data);
       setDataRecieved(true);
     } catch (err) {
@@ -150,8 +182,10 @@ export default function transactions() {
       );
       console.log(resp);
       console.log(resp.status)
-      if(resp.status === 201) {
+      if(resp.status >= 200 && resp.status < 300) {
         getTransactions();
+        getTransactionSplits();
+        getUsersFromGroup();
         setGroupUsersSpltting([]);
         setShowCreate(false);
         setDisableCreate(false);
@@ -161,8 +195,32 @@ export default function transactions() {
     };
   }
 
-  const displayUsers = (display: any[], location: string) => {
-    let image = true;
+  const displayTransactionUsers = (arr: SplitTransaction[] | undefined, cost: number) => {
+    console.log(groupUsersCopy)
+    if(arr) {
+      return (
+        <div className='flex flex-row space-x-4'>
+          
+          {arr.map((split: SplitTransaction, index:number) => (
+            <div key={index} className='flex flex-col space-y-2'>
+              <img 
+                className="rounded-full hover:cursor-pointer" 
+                src={groupUsersCopy.find((value: User) => {
+                  return split.user_id === value.id;
+                })?.picture} 
+                alt={"Couldn't find valid user"} width="50px"/>
+              <p>${(cost * split.share/100).toFixed(2)}</p>
+            </div>
+          ))}
+        </div>
+      )
+    } else {
+      return <div>Users couldn't be identified</div>
+    }
+    
+  }
+
+  const displayUsersCreate = (display: any[], location: string) => {
     if(display.length !== 0) {
       return (
         <div className='flex flex-row space-x-4'>
@@ -213,6 +271,7 @@ export default function transactions() {
       <div className="flex flex-col space-y-4">
         {/* Displays all the transactions that are part of this group */}
         {dataRecieved ? (
+          
           transactionsRetrieved.map((transaction: Transaction) => (
             <a 
               className="flex flex-col space-y-4 border-cyan-800 hover:cursor-pointer border" 
@@ -220,8 +279,11 @@ export default function transactions() {
             >
               <h2>{transaction.description}</h2>
               <p>Cost: {Number(transaction.cost).toFixed(2)}</p>
-              {/* display the users names from the userlist map that has a key of the group id */}
+              {/* display the users names for each transaction using the transaction.id as a key for the splitMapState Map */}
+              {displayTransactionUsers(splitMapState.get(transaction.id), transaction.cost)}
+             
               
+
             </a>
           ))
          ) : (
@@ -257,11 +319,11 @@ export default function transactions() {
           />
           <div>
             <h1>Not Splitting</h1>
-            {displayUsers(groupUsers, 'ns')}
+            {displayUsersCreate(groupUsers, 'ns')}
           </div>
           <div>
             <h1>Splitting</h1>
-            {displayUsers(groupUsersSplitting, 's')}
+            {displayUsersCreate(groupUsersSplitting, 's')}
           </div>
           <Button
             onClick={(e: MouseEvent<HTMLButtonElement>) => {createTransaction(e)}}
