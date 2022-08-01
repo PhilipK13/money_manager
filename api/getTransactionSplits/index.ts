@@ -50,7 +50,7 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<any[]> => {
         FROM transaction_splits
         WHERE transaction_id IN ($1);
       `,
-      [transactionList]);
+      [transactionList.replace('"', '')]);
     
 
     console.log("Normal" + rows);
