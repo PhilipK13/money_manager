@@ -55,10 +55,10 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<any[]> => {
       [transactions]);
     
 
-    console.log("Normal" + transactions_splits);
-    console.log("STRINGIFY" + JSON.stringify(transactions_splits));
+    console.log("Normal" + rows);
+    console.log("STRINGIFY" + JSON.stringify(rows));
 
-    return transactions_splits;
+    return rows;
   } catch (error) {
     console.error(error);
     throw error;
